@@ -16,19 +16,6 @@ unsigned int counter = 0;
 TTN_esp32 ttn ;
 TTN_CayenneLPP lpp;
 
-void message(const uint8_t* payload, size_t size, int rssi)
-{
-    Serial.println("-- MESSAGE");
-    Serial.print("Received " + String(size) + " bytes RSSI=" + String(rssi) + "db");
-    for (int i = 0; i < size; i++)
-    {
-        Serial.print(" " + String(payload[i]));
-        // Serial.write(payload[i]);
-    }
-
-    Serial.println();
-}
-
 void setup()
 {
     // Init Heltec OLED
