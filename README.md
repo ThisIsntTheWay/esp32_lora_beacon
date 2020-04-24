@@ -6,5 +6,5 @@ Utilizes the following libraries:
   - Incorporates CayenneLPP as well!
 - Heltec_ESP32: https://github.com/HelTecAutomation/Heltec_ESP32
 
-# ToDo:
+## ToDo
 - Implement GPS
