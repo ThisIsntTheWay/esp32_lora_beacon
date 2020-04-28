@@ -17,7 +17,7 @@ As long as access to UART1/UART2 is guaranteed, the board can be used.
 
 If an external module is used, make sure that it is compatible with the TTN_32 library!
 
-Any GPS module will work, as long as it's able to spit out NMEA messages directly.
+Any GPS module will work, as long as it's able to spit out NMEA messages directly.<br/>
 (I.e. doesn't produce data that can't be parsed by TinyGPS++.)
 
 ### ToDo
