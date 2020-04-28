@@ -11,8 +11,8 @@ Utilizes the following libraries:
   - For parsing NMEA messages.
 
 ### Intent
-The purpose of this project is to build a LoRaWAN coverage mapper, to be used in conjunction with "TTN Mapper phone surveyor".
-As it spits out GPS sensor data every few seconds, this can also work as a GPS tracker.
+The purpose of this project is to build a LoRaWAN coverage mapper, to be used in conjunction with "TTN Mapper phone surveyor".<br/>
+As it outputs GPS sensor data every few seconds, this can also work as a GPS tracker.
 
 ### Hardware
 Technically, any ESP32 based dev board will work with this project.<br/>
