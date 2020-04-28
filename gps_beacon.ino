@@ -8,13 +8,14 @@
 // Set LoRa Band (868MHz, Europe)
 #define BAND    868E6
 
-// TTN stuff (OTA)
+// TTN stuff
+// NOTE: The values requested are only applicable to a TTN-join via OTA!
 const char* devEui = "- - -"; //TTN Device EUI
 const char* appEui = "- - -"; //TTN Application EUI
 const char* appKey = "- - -"; //TTN Application Key
 
 // HW Serial and GPS config
-// Here, it's set to UART2.
+// NOTE: Here, it's set to UART2.
 static const int RXPin = 16, TXPin = 17;
 static const uint32_t GPSBaud = 9600;
 
@@ -27,13 +28,11 @@ TinyGPSplus gps;
 HardwareSerial sGPS(1);
 
 // TTN "Join" message
-// Mainly used for telemetry
 void message(const uint8_t* payload, size_t size, int rssi)
 {
     Serial.println("-- MESSAGE");
     Serial.print("Received " + String(size) + " bytes RSSI=" + String(rssi) + "db");
-    for (int i = 0; i < size; i++)
-    {
+    for (int i = 0; i < size; i++) {
         Serial.print(" " + String(payload[i]));
     }
 
@@ -70,7 +69,7 @@ void setup()
     Serial.print("Joining TTN ");
     while (!ttn.isJoined())
     {
-        // Keep printing '...' as long as TTN has not yet been joined.
+        // Keep printing '...' as long as TTN hasn't been joined yet.
         Serial.print(".");
         delay(500);
     }
@@ -87,12 +86,12 @@ void setup()
 
 void loop()
 {
-    // Encode/parse NMEA messages if the HW serial is available
+    // Encode/parse NMEA messages if the HW serial is available.
     while (sGPS.available() > 0) {
         gps.encode(sGPS.read());
     }
     
-    // Construct lpp buffer
+    // Construct lpp buffer.
     lpp.reset();
     lpp.addGPS(1, gps.location.lat(), gps.location.lng(), gps.altitude.meters());
 
