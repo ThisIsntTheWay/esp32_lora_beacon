@@ -11,8 +11,10 @@ Utilizes the following libraries:
   - For parsing NMEA messages.
 
 ### Intent
-The purpose of this project is to build a LoRaWAN coverage mapper, to be used in conjunction with "TTN Mapper phone surveyor".<br/>
-As it outputs GPS sensor data every few seconds, this can also work as a GPS tracker.
+The purpose of this project is to build a GPS tracker that communicates with 'The Things Network', based on LoRa tech.<br/>
+Can also be used as a TTN coverage mapper.
+
+If used as such, be aware that the produced data will have less priority as it is in the CayenneLPP format!
 
 ### Hardware
 Technically, any ESP32 based dev board will work with this project.<br/>
