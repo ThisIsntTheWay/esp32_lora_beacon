@@ -16,7 +16,7 @@ Can also be used as a TTN coverage mapper.<br/>
 ###### (If used as such, be aware that the produced data will have less priority as it is in the CayenneLPP format!)
 
 ### Hardware
-Technically, any ESP32 based dev board will work with this project.<br/>
+Technically, any ESP32 based dev board will work with this project:<br/>
 As long as access to UART1/UART2 is guaranteed, the board can be used.
 
 If an external LoRa module is used, make sure that it is compatible with the TTN_32 library!
