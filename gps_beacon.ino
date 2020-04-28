@@ -47,7 +47,6 @@ void setup()
     // Init Heltec OLED
     Heltec.begin(true /*DisplayEnable Enable*/, true /*Heltec.Heltec.Heltec.LoRa Disable*/, true /*Serial Enable*/, true /*PABOOST Enable*/, BAND /*long BAND*/);
     Heltec.display->init();
-    Heltec.display.setTextColor(YELLOW, BLACK);
     Heltec.display->flipScreenVertically();
     Heltec.display->setFont(ArialMT_Plain_10);
     Heltec.display->clear();
@@ -87,8 +86,6 @@ void setup()
 
 void loop()
 {   
-    Heltec.display.setTextColor(WHITE, BLACK);
-    
     // Encode/parse NMEA messages if the HW serial is available.
     while (Serial2.available() > 0) {
         gps.encode(Serial2.read());
@@ -110,9 +107,7 @@ void loop()
         Serial.printf("cLPP packet: %f %d %02X%02X\n", lpp.getBuffer()[0], lpp.getBuffer()[1],
             lpp.getBuffer()[2], lpp.getBuffer()[3]);
     } else {
-        Serial.println("cLPP packet transmission failure.");  
-        
-        Heltec.display.setTextColor(RED, BLACK);
+        Serial.println("cLPP packet transmission failure.");
         Heltec.display->drawString(0, 40, "cLPP packet failure!");
     }
 
