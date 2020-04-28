@@ -47,6 +47,7 @@ void setup()
     // Init Heltec OLED
     Heltec.begin(true /*DisplayEnable Enable*/, true /*Heltec.Heltec.Heltec.LoRa Disable*/, true /*Serial Enable*/, true /*PABOOST Enable*/, BAND /*long BAND*/);
     Heltec.display->init();
+    Heltec.display.setTextColor(YELLOW, BLACK);
     Heltec.display->flipScreenVertically();
     Heltec.display->setFont(ArialMT_Plain_10);
     Heltec.display->clear();
@@ -85,12 +86,16 @@ void setup()
 }
 
 void loop()
-{        
+{   
+    Heltec.display.setTextColor(WHITE, BLACK);
+    
     // Encode/parse NMEA messages if the HW serial is available.
     while (Serial2.available() > 0) {
         gps.encode(Serial2.read());
     }
 
+    // Convert TinyGPS++ output to float.
+    // CayenneLPP cannot interpret the output otherwise.
     float gLat = gps.location.lat();
     float gLng = gps.location.lng();
     float gAlt = gps.altitude.meters();
@@ -102,8 +107,13 @@ void loop()
     // Send out lpp packet to TTN
     if (ttn.sendBytes(lpp.getBuffer(), lpp.getSize())) {
         // Write sent lpp packet to serial.
-        Serial.printf("CLPP packet: %f %d %02X%02X\n", lpp.getBuffer()[0], lpp.getBuffer()[1],
+        Serial.printf("cLPP packet: %f %d %02X%02X\n", lpp.getBuffer()[0], lpp.getBuffer()[1],
             lpp.getBuffer()[2], lpp.getBuffer()[3]);
+    } else {
+        Serial.println("cLPP packet transmission failure.");  
+        
+        Heltec.display.setTextColor(RED, BLACK);
+        Heltec.display->drawString(0, 40, "cLPP packet failure!");
     }
 
     // Spit out info to serial
@@ -119,7 +129,6 @@ void loop()
     Heltec.display->clear();
     Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
     Heltec.display->setFont(ArialMT_Plain_10);
-    
     Heltec.display->drawString(0, 0, "Packets sent: ");
     Heltec.display->drawString(90, 0, String(counter));    
     Heltec.display->drawString(0, 20, "GPS Satellites: ");
