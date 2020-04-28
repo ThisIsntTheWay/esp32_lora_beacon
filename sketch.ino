@@ -3,24 +3,31 @@
 #include "TTN_CayenneLPP.h"
 #include "heltec.h"
 #include "TinyGPS++.h"
+#include <HardwareSerial.h>
 
 // Set LoRa Band (868MHz, Europe)
 #define BAND    868E6
 
-// TTN stuff
-const char* devEui = "- - -"; // Change to TTN Device EUI
-const char* appEui = "- - -"; // Change to TTN Application EUI
-const char* appKey = "- - -"; // Chaneg to TTN Application Key
+// TTN stuff (OTA)
+const char* devEui = "- - -"; //TTN Device EUI
+const char* appEui = "- - -"; //TTN Application EUI
+const char* appKey = "- - -"; //TTN Application Key
+
+// HW Serial and GPS config
+// Here, it's set to UART2.
+static const int RXPin = 16, TXPin = 17;
+static const uint32_t GPSBaud = 9600;
 
 unsigned int counter = 0;
 
 // Init libraries
 TTN_esp32 ttn;
 TTN_CayenneLPP lpp;
-TinyGPS++ gps;
+TinyGPSplus gps;
+HardwareSerial sGPS(1);
 
 // TTN "Join" message
-// Mainly used for telemetry.
+// Mainly used for telemetry
 void message(const uint8_t* payload, size_t size, int rssi)
 {
     Serial.println("-- MESSAGE");
@@ -35,6 +42,9 @@ void message(const uint8_t* payload, size_t size, int rssi)
 
 void setup()
 {
+    // Start listening to HW Serial channel
+    sGPS.begin(GPSBaud, SERIAL_8IN1, RXPin, TXPin);
+    
     // Init Heltec OLED
     Heltec.begin(true /*DisplayEnable Enable*/, true /*Heltec.Heltec.Heltec.LoRa Disable*/, true /*Serial Enable*/, true /*PABOOST Enable*/, BAND /*long BAND*/);
     Heltec.display->init();
@@ -77,9 +87,14 @@ void setup()
 
 void loop()
 {
+    // Encode/parse NMEA messages if the HW serial is available
+    while (sGPS.available() > 0) {
+        gps.encode(sGPS.read());
+    }
+    
     // Construct lpp buffer
     lpp.reset();
-    lpp.addGPS(1, gLat, gLon, gAlt);
+    lpp.addGPS(1, gps.location.lat(), gps.location.lng(), gps.altitude.meters());
 
     // Send out lpp packet to TTN
     if (ttn.sendBytes(lpp.getBuffer(), lpp.getSize())) {
@@ -94,7 +109,11 @@ void loop()
     Heltec.display->setFont(ArialMT_Plain_10);
     
     Heltec.display->drawString(0, 0, "Packets sent: ");
-    Heltec.display->drawString(90, 0, String(counter));
+    Heltec.display->drawString(90, 0, String(counter));    
+    Heltec.display->drawString(0, 10, "GPS Satellites: ");
+    Heltec.display->drawString(90, 10, String(gps.satellites.value()));    
+    Heltec.display->drawString(0, 20, "Perceived HDOP: ");
+    Heltec.display->drawString(90, 20, String(gps.hdop.value()));
     Heltec.display->display();
     counter++;
     delay(3000);
