@@ -25,6 +25,6 @@ If an external LoRa module is used, make sure that it is compatible with the TTN
 Any GPS module will work, as long as it's able to spit out NMEA messages directly.<br/>
 (I.e. doesn't produce data that can't be parsed by TinyGPS++.)
 
-### ToDo
-- Implement GPS
-  - Currently on hold because my GPS sensor is DOA.
+### Notes
+The UART2 RX pin is set to 23 instead of the standard 16, because on heltec this pin is used by OLED_RST already.</br>
+This has distorted the GPS output to the point of it becoming unusable. (YMMV)
