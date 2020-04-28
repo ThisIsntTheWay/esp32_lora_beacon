@@ -11,8 +11,7 @@ Utilizes the following libraries:
   - For parsing NMEA messages.
 
 ### Intent
-The purpose of this project is to build a GPS tracker that communicates with 'The Things Network', based on LoRa tech.
-
+The purpose of this project is to build a GPS tracker that communicates with 'The Things Network', based on LoRa tech.<br/>
 Can also be used as a TTN coverage mapper.<br/>
 ###### (If used as such, be aware that the produced data will have less priority as it is in the CayenneLPP format!)
 
