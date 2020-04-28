@@ -3,9 +3,12 @@ LoRa beacon based on a WiFi_LoRa_32_v2 board.
 
 Utilizes the following libraries:
 - TTN_32: https://github.com/rgot-org/TheThingsNetwork_esp32
+  - Implements an interface with TTN and the LoRa module.
   - Incorporates CayenneLPP as well!
 - Heltec_ESP32: https://github.com/HelTecAutomation/Heltec_ESP32
+  - Mainly for interfacing with the onboard OLED screen.
 - TinyGPS++: http://arduiniana.org/libraries/tinygpsplus/
+  - For parsing NMEA messages.
 
 ### Intent
 The purpose of this project is to build a LoRaWAN coverage mapper, to be used in conjunction with "TTN Mapper phone surveyor".
@@ -22,3 +25,4 @@ Any GPS module will work, as long as it's able to spit out NMEA messages directl
 
 ### ToDo
 - Implement GPS
+  - Currently on hold because my GPS sensor is DOA.
