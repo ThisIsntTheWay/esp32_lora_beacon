@@ -3,7 +3,6 @@
 *   Author: vk, contact@klopfen.rocks
 *
 *   Version: 1.1
-*   (Not yet tested)
 */
 
 // Libraries
