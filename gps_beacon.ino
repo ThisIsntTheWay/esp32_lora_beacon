@@ -1,6 +1,9 @@
 /*
 *   This is a GPS tracker based on an ESP32 that is LoRa-capable.   
 *   Author: vk, contact@klopfen.rocks
+*
+*   Version: 1.1
+*   (Not yet tested)
 */
 
 // Libraries
@@ -21,11 +24,14 @@ const char* appKey = "- - -"; //TTN Application Key
 
 // HW Serial and GPS config
 // NOTE: Here, it's set to UART2.
-#define RXD2 23
-#define TXD2 17
+#define RXD2    23
+#define TXD2    17
 #define GPSBaud 9600
 
+// MISC things
+#define satThreshold 4;
 unsigned int counter = 0;
+bool realiableFix = false;
 
 // Init libraries
 TTN_esp32 ttn;
@@ -90,7 +96,11 @@ void setup()
 }
 
 void loop()
-{   
+{           
+    Heltec.display->clear();
+    Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
+    Heltec.display->setFont(ArialMT_Plain_10);
+    
     // Encode/parse NMEA messages if the HW serial is available.
     while (Serial2.available() > 0) {
         gps.encode(Serial2.read());
@@ -101,41 +111,57 @@ void loop()
     float gLat = gps.location.lat();
     float gLng = gps.location.lng();
     float gAlt = gps.altitude.meters();
+    int gSat = gps.satellites.value();
     
-    // Construct lpp buffer.
-    lpp.reset();
-    lpp.addGPS(1, gLat, gLng, gAlt);
-
-    // Send out lpp packet to TTN
-    if (ttn.sendBytes(lpp.getBuffer(), lpp.getSize())) {
-        // Write sent lpp packet to serial.
-        Serial.printf("cLPP packet: %f %d %02X%02X\n", lpp.getBuffer()[0], lpp.getBuffer()[1],
-            lpp.getBuffer()[2], lpp.getBuffer()[3]);
+    // Determine quality of GPS lock
+    if (gSat < satThreshold) {
+        reliableFix = false;
     } else {
-        Serial.println("cLPP packet transmission failure.");
-        Heltec.display->drawString(0, 40, "cLPP packet failure!");
+        reliableFix = true;
     }
+    
+    if (reliableFix) {    
+        // Construct lpp buffer.
+        lpp.reset();
+        lpp.addGPS(1, gLat, gLng, gAlt);
 
-    // Spit out info to serial
-    Serial.println();
-    Serial.print("LAT - "); Serial.println(gps.location.lat());
-    Serial.print("LON - "); Serial.println(gps.location.lng());
-    Serial.print("ALT - "); Serial.println(gps.altitude.meters());
-    Serial.print("SAT - "); Serial.println(gps.satellites.value());
-    Serial.print("HDOP - "); Serial.println(gps.hdop.value());
-    Serial.println("-----------------------");
+        // Send out lpp packet to TTN
+        if (ttn.sendBytes(lpp.getBuffer(), lpp.getSize())) {
+            // Write sent lpp packet to serial.
+            Serial.printf("cLPP packet: %f %d %02X%02X\n", lpp.getBuffer()[0], lpp.getBuffer()[1],
+                lpp.getBuffer()[2], lpp.getBuffer()[3]);
+        } else {
+            Serial.println("cLPP packet transmission failure.");
+            Heltec.display->drawString(0, 40, "cLPP packet failure!");
+        }
 
-    // Write to OLED
-    Heltec.display->clear();
-    Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
-    Heltec.display->setFont(ArialMT_Plain_10);
-    Heltec.display->drawString(0, 0, "Packets sent: ");
-    Heltec.display->drawString(90, 0, String(counter));    
-    Heltec.display->drawString(0, 20, "GPS Satellites: ");
-    Heltec.display->drawString(90, 20, String(gps.satellites.value()));    
-    Heltec.display->drawString(0, 30, "Perceived HDOP: ");
-    Heltec.display->drawString(90, 30, String(gps.hdop.value()));
-    Heltec.display->display();
+        // Spit out info to serial
+        Serial.println();
+        Serial.print("LAT - "); Serial.println(gps.location.lat());
+        Serial.print("LON - "); Serial.println(gps.location.lng());
+        Serial.print("ALT - "); Serial.println(gps.altitude.meters());
+        Serial.print("SAT - "); Serial.println(gps.satellites.value());
+        Serial.print("HDOP - "); Serial.println(gps.hdop.value());
+        Serial.println("-----------------------");
+
+        // Write to OLED
+        Heltec.display->drawString(0, 0, "Packets sent: ");
+        Heltec.display->drawString(90, 0, String(counter));    
+        Heltec.display->drawString(0, 20, "GPS Satellites: ");
+        Heltec.display->drawString(90, 20, String(gSat));    
+        Heltec.display->drawString(0, 30, "Perceived HDOP: ");
+        Heltec.display->drawString(90, 30, String(gps.hdop.value()));
+        Heltec.display->display();
+    } else {
+        Serial.println("No reliable GPS fix.");
+        Serial.printf("Detected satellites: %f", String(gSat)); Serial.println();   
+        
+        Heltec.display->drawString(0, 0, "[x] No reliable GPS fix."); 
+        Heltec.display->drawString(0, 20, "Satellites:");
+        Heltec.display->drawString(90, 20, String(gSat));
+        Heltec.display->drawString(0, 30, "Expected:");
+        Heltec.display->drawString(90, 30, String(satThreshold));
+    }
     
     counter++;
     delay(3000);
