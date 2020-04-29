@@ -1,3 +1,8 @@
+/*
+*   This is a GPS tracker based on an ESP32 that is LoRa-capable.   
+*   Author: vk, contact@klopfen.rocks
+*/
+
 // Libraries
 #include <TTN_esp32.h>
 #include "TTN_CayenneLPP.h"
