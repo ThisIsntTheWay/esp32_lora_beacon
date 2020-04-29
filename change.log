@@ -1,0 +1,11 @@
+Version 1.1 - Bugfixes, new feature
+- Only communicate with TTN if a certain threshold of GPS satellites has been reached.
+   > This would otherwise result in worthless data being sent to TTN.
+   
+================================================================================================================
+Version 1.0 - Initial release
+- First working release.
+   > Communication with TTN works.
+   > GPS data can be encoded.
+   > Valid data gets sent to TTN.
+- Periodically send GPS data, even if no fix has been obtained yet.
