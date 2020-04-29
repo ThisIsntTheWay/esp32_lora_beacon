@@ -29,9 +29,9 @@ const char* appKey = "- - -"; //TTN Application Key
 #define GPSBaud 9600
 
 // MISC things
-#define satThreshold 4;
+#define satThreshold 4
 unsigned int counter = 0;
-bool realiableFix = false;
+bool reliableFix = false;
 
 // Init libraries
 TTN_esp32 ttn;
@@ -100,6 +100,7 @@ void loop()
     Heltec.display->clear();
     Heltec.display->setTextAlignment(TEXT_ALIGN_LEFT);
     Heltec.display->setFont(ArialMT_Plain_10);
+    Heltec.display->display();
     
     // Encode/parse NMEA messages if the HW serial is available.
     while (Serial2.available() > 0) {
@@ -133,6 +134,7 @@ void loop()
         } else {
             Serial.println("cLPP packet transmission failure.");
             Heltec.display->drawString(0, 40, "cLPP packet failure!");
+            Heltec.display->display();
         }
 
         // Spit out info to serial
@@ -154,13 +156,14 @@ void loop()
         Heltec.display->display();
     } else {
         Serial.println("No reliable GPS fix.");
-        Serial.printf("Detected satellites: %f", String(gSat)); Serial.println();   
+        Serial.printf("Detected satellites: %f", gSat); Serial.println();   
         
         Heltec.display->drawString(0, 0, "[x] No reliable GPS fix."); 
         Heltec.display->drawString(0, 20, "Satellites:");
         Heltec.display->drawString(90, 20, String(gSat));
         Heltec.display->drawString(0, 30, "Expected:");
         Heltec.display->drawString(90, 30, String(satThreshold));
+        Heltec.display->display();
     }
     
     counter++;
