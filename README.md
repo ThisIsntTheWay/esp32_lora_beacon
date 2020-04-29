@@ -1,5 +1,5 @@
 # esp32_lora_beacon
-LoRa beacon based on a WiFi_LoRa_32_v2 board.
+LoRa beacon based on a Heltec 'WiFi_LoRa_32_v2' board.
 
 Utilizes the following libraries:
 - TTN_32: https://github.com/rgot-org/TheThingsNetwork_esp32
