@@ -12,11 +12,11 @@
 #include "TinyGPS++.h"
 #include <HardwareSerial.h>
 
-// Set LoRa Band (868MHz, Europe)
+// Set LoRa Band (868MHz; Europe)
 #define BAND 868E6
 
 // TTN stuff
-// NOTE: The values requested are only applicable to a TTN-join via OTA!
+// NOTE: Set TTN Device to register via OOTA!
 const char* devEui = "- - -"; //TTN Device EUI
 const char* appEui = "- - -"; //TTN Application EUI
 const char* appKey = "- - -"; //TTN Application Key
@@ -27,7 +27,7 @@ const char* appKey = "- - -"; //TTN Application Key
 #define TXD2    17
 #define GPSBaud 9600
 
-// MISC things
+// Uncategorized/misc. variables
 #define satThreshold 4
 unsigned int counter = 0;
 bool reliableFix = false;
@@ -88,6 +88,7 @@ void setup()
     Heltec.display->display();
     ttn.showStatus(); // <-- Only visible on a serial monitor.
     
+    // Inform user that initialization has ended.
     Heltec.display->drawString(0, 40, "Init concluded!");
     Heltec.display->display();
 
@@ -101,13 +102,13 @@ void loop()
     Heltec.display->setFont(ArialMT_Plain_10);
     Heltec.display->display();
     
-    // Encode/parse NMEA messages if the HW serial is available.
+    // Encode/parse NMEA messages if there's data ingress on UART2 RX
     while (Serial2.available() > 0) {
         gps.encode(Serial2.read());
     }
 
-    // Convert TinyGPS++ output to float.
-    // CayenneLPP cannot interpret the output otherwise.
+    // Convert TinyGPS++ output to different datatypes.
+    // CayenneLPP expects floats, while the heltec OLED library only likes STRING and/or INT
     float gLat = gps.location.lat();
     float gLng = gps.location.lng();
     float gAlt = gps.altitude.meters();
@@ -120,6 +121,7 @@ void loop()
         reliableFix = true;
     }
     
+    // LPP logic
     if (reliableFix) {    
         // Construct lpp buffer.
         lpp.reset();
@@ -154,6 +156,7 @@ void loop()
         Heltec.display->drawString(90, 30, String(gps.hdop.value()));
         Heltec.display->display();
     } else {
+        // If satThreshold has not been reached
         Serial.println("No reliable GPS fix.");
         Serial.printf("Detected satellites: %f", gSat); Serial.println();   
         
